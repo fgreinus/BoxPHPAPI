@@ -1,9 +1,8 @@
 <?php 
 	define( '_CODENAME', 'BoxPHPAPI'); 
-	define( '_VERSION', '1.0.7'); 
-	define( '_URL', 'https://github.com/golchha21/BoxPHPAPI');
-	error_reporting(E_ERROR);
-	
+	define( '_VERSION', '1.0.8');
+	define( '_URL', 'https://github.com/fgreinus/BoxPHPAPI');
+
 	class Box_API {
 		
 		public $client_id 		= '';
@@ -18,7 +17,7 @@
 
 		public function __construct($client_id = '', $client_secret = '', $redirect_uri = '') {
 			if(empty($client_id) || empty($client_secret)) {
-				throw ('Invalid CLIENT_ID or CLIENT_SECRET or REDIRECT_URL. Please provide CLIENT_ID, CLIENT_SECRET and REDIRECT_URL when creating an instance of the class.');
+				throw Exception('Invalid CLIENT_ID or CLIENT_SECRET or REDIRECT_URL. Please provide CLIENT_ID, CLIENT_SECRET and REDIRECT_URL when creating an instance of the class.');
 			} else {
 				$this->client_id 		= $client_id;
 				$this->client_secret	= $client_secret;

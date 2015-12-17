@@ -1,5 +1,5 @@
 {
-    "name": "golchha21/boxphpapi",
+    "name": "fgreinus/boxphpapi",
     "type": "API",
     "description": "Unofficial BoxPHPAPI v2",
     "keywords": ["Box","BoxAPI","PHP","API"],
@@ -10,8 +10,16 @@
             "name": "Ulhas Vardhan Golchha",
             "homepage": "http://www.ulhas.net/",
             "role": "Developer"
+        },
+        {
+            "name": "Florian Greinus",
+            "homepage": "https://www.fgrein.us",
+            "role": "Developer"
         }
     ],
+    "autoload": {
+        "classmap": ["library/BoxApi.class.php"]
+    },
     "support": {
         "issues": "https://github.com/golchha21/BoxPHPAPI/issues",
         "source": "https://github.com/golchha21/BoxPHPAPI"
