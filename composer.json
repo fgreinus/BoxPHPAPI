@@ -2,7 +2,7 @@
     "name": "fgreinus/boxphpapi",
     "type": "API",
     "description": "Unofficial BoxPHPAPI v2",
-    "keywords": ["Box","BoxAPI","PHP","API"],
+    "keywords": ["Box.com","BoxAPI","PHP","API"],
     "homepage": "http://www.ulhas.net/GitHub/BoxPHPAPI/",
     "license": "Apache License 2.0",
     "authors": [
@@ -17,8 +17,13 @@
             "role": "Developer"
         }
     ],
+    "require": {
+        "php": ">=5.5"
+    },
     "autoload": {
-        "classmap": ["library/BoxApi.class.php"]
+        "psr-4": {
+            "Box\\Content\\": "src/Box/Content/"
+        }
     },
     "support": {
         "issues": "https://github.com/golchha21/BoxPHPAPI/issues",

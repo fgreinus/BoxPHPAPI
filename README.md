@@ -1,9 +1,7 @@
-# [BoxPHPAPI](http://goo.gl/7V1ayp)
+# BoxPHPAPI
 
 Unofficial BoxPHPAPI v2 based on the API documentations.
-
-## Demonstration
-* [BoxPHPAPI](http://goo.gl/MKcxSd)
+This project is highly untested and should only be used as base for your own implementation.
 
 ## Features
 * Fetches the user details.
@@ -23,10 +21,7 @@ Unofficial BoxPHPAPI v2 based on the API documentations.
 	* Share file
 
 ## Support
-Use the [GitHub Issue Tracker](http://goo.gl/eaa8GC) to ask questions and get support.
-
-## Changelog
-You can see the changelog <a href="CHANGELOG.md">here</a>.
+Use the Issue Tracker of this Github Repository for further questions.
 
 ## License
 You can see the license <a href="LICENSE.md">here</a>.
