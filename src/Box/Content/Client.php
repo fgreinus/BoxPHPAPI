@@ -15,7 +15,7 @@ class Client
     public function __construct($client_id = '', $client_secret = '', $redirect_uri = '')
     {
         if (empty($client_id) || empty($client_secret)) {
-            throw Exception('Invalid CLIENT_ID or CLIENT_SECRET or REDIRECT_URL. Please provide CLIENT_ID, CLIENT_SECRET and REDIRECT_URL when creating an instance of the class.');
+            throw new \Exception('Invalid CLIENT_ID or CLIENT_SECRET or REDIRECT_URL. Please provide CLIENT_ID, CLIENT_SECRET and REDIRECT_URL when creating an instance of the class.');
         } else {
             $this->client_id = $client_id;
             $this->client_secret = $client_secret;
@@ -269,11 +269,12 @@ class Client
 
     /* Loads the token */
 
-    public function putFile($filename, $name, $parent_id = '0')
+    public function putFile($filePath, $name, $parent_id = '0')
     {
         $url = $this->buildUrl('/files/content', array(), $this->upload_url);
-        if (!isset($name)) {
-            $name = basename($filename);
+
+        if (!isset($name) || empty($name)) {
+            $name = basename($filePath);
         }
 
         $attributes = [
@@ -285,7 +286,7 @@ class Client
 
         $params = [
             'attributes' => json_encode($attributes),
-            'file' => new CURLFile(Yii::$app->getBasePath().'/'.$name, "", 'file'),
+            'file' => new \CURLFile($filePath, "", 'file'),
         ];
 
         return json_decode($this->post($url, $params), true);
