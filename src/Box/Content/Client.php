@@ -2,24 +2,26 @@
 
 class Client
 {
-    public $client_id = '';
-    public $client_secret = '';
-    public $redirect_uri = '';
-    public $access_token = '';
-    public $refresh_token = '';
-    public $authorize_url = 'https://www.box.com/api/oauth2/authorize';
-    public $token_url = 'https://www.box.com/api/oauth2/token';
-    public $api_url = 'https://api.box.com/2.0';
-    public $upload_url = 'https://upload.box.com/api/2.0';
+    public $clientId = '';
+    public $clientSecret = '';
+    public $redirectUri = '';
+    public $accessToken= '';
+    public $refreshToken = '';
+    public $authorizeUrl = 'https://www.box.com/api/oauth2/authorize';
+    public $tokenUrl = 'https://www.box.com/api/oauth2/token';
+    public $apiUrl = 'https://api.box.com/2.0';
+    public $uploadUrl = 'https://upload.box.com/api/2.0';
 
-    public function __construct($client_id = '', $client_secret = '', $redirect_uri = '')
+    public $tokenStoragePath = './';
+
+    public function __construct($clientId = '', $clientSecret = '', $redirectUri = '')
     {
-        if (empty($client_id) || empty($client_secret)) {
+        if (empty($clientId) || empty($clientSecret)) {
             throw new \Exception('Invalid CLIENT_ID or CLIENT_SECRET or REDIRECT_URL. Please provide CLIENT_ID, CLIENT_SECRET and REDIRECT_URL when creating an instance of the class.');
         } else {
-            $this->client_id = $client_id;
-            $this->client_secret = $client_secret;
-            $this->redirect_uri = $redirect_uri;
+            $this->clientId = $clientId;
+            $this->clientSecret = $clientSecret;
+            $this->redirectUri = $redirectUri;
         }
     }
 
@@ -27,17 +29,15 @@ class Client
     public function getCode()
     {
         if (array_key_exists('refresh_token', $_REQUEST)) {
-            $this->refresh_token = $_REQUEST['refresh_token'];
+            $this->refreshToken = $_REQUEST['refresh_token'];
         } else {
-            // echo $url = $this->authorize_url . '?' . http_build_query(array('response_type' => 'code', 'client_id' => $this->client_id, 'redirect_uri' => $this->redirect_uri));
-            $url = $this->authorize_url . '?' . http_build_query(array('response_type' => 'code', 'client_id' => $this->client_id, 'redirect_uri' => $this->redirect_uri));
+            $url = $this->authorizeUrl . '?' . http_build_query(array('response_type' => 'code', 'client_id' => $this->clientId, 'redirect_uri' => $this->redirectUri));
             header('location: ' . $url);
             exit();
         }
     }
 
     /* Second step for authentication [Gets the access_token and the refresh_token] */
-
     public function getUser()
     {
         $url = $this->buildUrl('/users/me');
@@ -45,14 +45,13 @@ class Client
     }
 
     /* Gets the current user details */
-
     private function buildUrl($api_func, array $opts = array(), $url = null)
     {
         $opts = $this->setOptions($opts);
         if (!is_null($url)) {
             $base = $url . $api_func . '?';
         } else {
-            $base = $this->api_url . $api_func . '?';
+            $base = $this->apiUrl . $api_func . '?';
         }
         $query_string = http_build_query($opts);
         $base = $base . $query_string;
@@ -60,17 +59,15 @@ class Client
     }
 
     /* Get the details of the mentioned folder */
-
     private function setOptions(array $opts)
     {
         if (!array_key_exists('access_token', $opts)) {
-            $opts['access_token'] = $this->access_token;
+            $opts['access_token'] = $this->accessToken;
         }
         return $opts;
     }
 
     /* Get the list of items in the mentioned folder */
-
     private static function get($url)
     {
         $ch = curl_init();
@@ -83,7 +80,6 @@ class Client
     }
 
     /* Get the list of collaborators in the mentioned folder */
-
     public function getFolderDetails($folder, $json = false)
     {
         $url = $this->buildUrl("/folders/$folder");
@@ -95,7 +91,6 @@ class Client
     }
 
     /* Lists the folders in the mentioned folder */
-
     public function getFolderCollaborators($folder, $json = false)
     {
         $url = $this->buildUrl("/folders/$folder/collaborations");
@@ -107,7 +102,6 @@ class Client
     }
 
     /* Lists the files in the mentioned folder */
-
     public function getFolders($folder)
     {
         $data = $this->getFolderItems($folder);
@@ -122,7 +116,6 @@ class Client
     }
 
     /* Lists the files in the mentioned folder */
-
     public function getFolderItems($folder, $json = false)
     {
         $url = $this->buildUrl("/folders/$folder/items");
@@ -147,7 +140,6 @@ class Client
     }
 
     /* Modifies the folder details as per the api */
-
     public function getLinks($folder)
     {
         $data = $this->getFolderItems($folder);
@@ -162,7 +154,6 @@ class Client
     }
 
     /* Deletes a folder */
-
     public function createFolder($name, $parent_id)
     {
         $url = $this->buildUrl("/folders");
@@ -171,7 +162,6 @@ class Client
     }
 
     /* Shares a folder */
-
     private static function post($url, $params, $headers = [])
     {
         $ch = curl_init();
@@ -189,7 +179,6 @@ class Client
     }
 
     /* Shares a file */
-
     public function updateFolder($folder, array $params)
     {
         $url = $this->buildUrl("/folders/$folder");
@@ -197,7 +186,6 @@ class Client
     }
 
     /* Get the details of the mentioned file */
-
     private static function put($url, array $params = array())
     {
         $ch = curl_init();
@@ -212,7 +200,6 @@ class Client
     }
 
     /* Uploads a file */
-
     public function deleteFolder($folder, array $opts)
     {
         echo $url = $this->buildUrl("/folders/$folder", $opts);
@@ -225,7 +212,6 @@ class Client
     }
 
     /* Modifies the file details as per the api */
-
     private static function delete($url, $params = '')
     {
         $ch = curl_init();
@@ -240,7 +226,6 @@ class Client
     }
 
     /* Deletes a file */
-
     public function shareFolder($folder, array $params)
     {
         $url = $this->buildUrl("/folders/$folder");
@@ -248,7 +233,6 @@ class Client
     }
 
     /* Saves the token */
-
     public function shareFile($file, array $params)
     {
         $url = $this->buildUrl("/files/$file");
@@ -256,7 +240,6 @@ class Client
     }
 
     /* Reads the token */
-
     public function getFileDetails($file, $json = false)
     {
         $url = $this->buildUrl("/files/$file");
@@ -268,10 +251,9 @@ class Client
     }
 
     /* Loads the token */
-
     public function putFile($filePath, $name, $parent_id = '0')
     {
-        $url = $this->buildUrl('/files/content', array(), $this->upload_url);
+        $url = $this->buildUrl('/files/content', array(), $this->uploadUrl);
 
         if (!isset($name) || empty($name)) {
             $name = basename($filePath);
@@ -293,7 +275,6 @@ class Client
     }
 
     /* Builds the URL for the call */
-
     public function updateFile($file, array $params)
     {
         $url = $this->buildUrl("/files/$file");
@@ -301,7 +282,6 @@ class Client
     }
 
     /* Sets the required before building the query */
-
     public function deleteFile($file)
     {
         $url = $this->buildUrl("/files/$file");
@@ -323,17 +303,17 @@ class Client
                 $this->error = $array['error_description'];
                 return false;
             } elseif ($this->expired($array['expires_in'], $array['timestamp'])) {
-                $this->refresh_token = $array['refresh_token'];
+                $this->refreshToken = $array['refresh_token'];
                 $token = $this->getToken(NULL, true);
                 if ($this->writeToken($token, 'file')) {
                     $array = json_decode($token, true);
-                    $this->refresh_token = $array['refresh_token'];
-                    $this->access_token = $array['access_token'];
+                    $this->refreshToken = $array['refresh_token'];
+                    $this->accessToken = $array['access_token'];
                     return true;
                 }
             } else {
-                $this->refresh_token = $array['refresh_token'];
-                $this->access_token = $array['access_token'];
+                $this->refreshToken = $array['refresh_token'];
+                $this->accessToken = $array['access_token'];
                 return true;
             }
         }
@@ -341,9 +321,9 @@ class Client
 
     public function readToken($type = 'file', $json = false)
     {
-        if ($type == 'file' && file_exists('token.box')) {
-            $fp = fopen('token.box', 'r');
-            $content = fread($fp, filesize('token.box'));
+        if ($type == 'file' && file_exists($this->tokenStoragePath.'token.box')) {
+            $fp = fopen($this->tokenStoragePath.'token.box', 'r');
+            $content = fread($fp, filesize($this->tokenStoragePath.'token.box'));
             fclose($fp);
         } else {
             return false;
@@ -367,11 +347,11 @@ class Client
 
     public function getToken($code = '', $json = false)
     {
-        $url = $this->token_url;
-        if (!empty($this->refresh_token)) {
-            $params = array('grant_type' => 'refresh_token', 'refresh_token' => $this->refresh_token, 'client_id' => $this->client_id, 'client_secret' => $this->client_secret);
+        $url = $this->tokenUrl;
+        if (!empty($this->refreshToken)) {
+            $params = array('grant_type' => 'refresh_token', 'refresh_token' => $this->refreshToken, 'client_id' => $this->clientId, 'client_secret' => $this->clientSecret);
         } else {
-            $params = array('grant_type' => 'authorization_code', 'code' => $code, 'client_id' => $this->client_id, 'client_secret' => $this->client_secret);
+            $params = array('grant_type' => 'authorization_code', 'code' => $code, 'client_id' => $this->clientId, 'client_secret' => $this->clientSecret);
         }
         if ($json) {
             return $this->post($url, $params);
@@ -389,7 +369,7 @@ class Client
         } else {
             $array['timestamp'] = time();
             if ($type == 'file') {
-                $fp = fopen('token.box', 'w');
+                $fp = fopen($this->tokenStoragePath.'token.box', 'w');
                 fwrite($fp, json_encode($array));
                 fclose($fp);
             }
