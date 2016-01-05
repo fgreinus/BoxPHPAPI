@@ -5,7 +5,7 @@ class Client
     public $clientId = '';
     public $clientSecret = '';
     public $redirectUri = '';
-    public $accessToken= '';
+    public $accessToken = '';
     public $refreshToken = '';
     public $authorizeUrl = 'https://www.box.com/api/oauth2/authorize';
     public $tokenUrl = 'https://www.box.com/api/oauth2/token';
@@ -111,6 +111,7 @@ class Client
     public function getFolders($folder)
     {
         $data = $this->getFolderItems($folder);
+        $return = array();
         foreach ($data['entries'] as $item) {
             $array = '';
             if ($item['type'] == 'folder') {
@@ -135,6 +136,7 @@ class Client
     public function getFiles($folder)
     {
         $data = $this->getFolderItems($folder);
+        $return = array();
         foreach ($data['entries'] as $item) {
             $array = '';
             if ($item['type'] == 'file') {
@@ -149,6 +151,7 @@ class Client
     public function getLinks($folder)
     {
         $data = $this->getFolderItems($folder);
+        $return = array();
         foreach ($data['entries'] as $item) {
             $array = '';
             if ($item['type'] == 'web_link') {
@@ -160,7 +163,7 @@ class Client
     }
 
     /* Deletes a folder */
-    public function createFolder($name, $parent_id)
+    public function createFolder($name, $parent_id = '0')
     {
         $url = $this->buildUrl("/folders");
         $params = array('name' => $name, 'parent' => array('id' => $parent_id));
@@ -208,12 +211,12 @@ class Client
     /* Uploads a file */
     public function deleteFolder($folder, array $opts)
     {
-        echo $url = $this->buildUrl("/folders/$folder", $opts);
+        $url = $this->buildUrl("/folders/$folder", $opts);
         $return = json_decode($this->delete($url), true);
         if (empty($return)) {
-            return 'The folder has been deleted.';
+            return true;
         } else {
-            return $return;
+            return false;
         }
     }
 
@@ -327,9 +330,9 @@ class Client
 
     public function readToken($type = 'file', $json = false)
     {
-        if ($type == 'file' && file_exists($this->tokenStoragePath.'token.box')) {
-            $fp = fopen($this->tokenStoragePath.'token.box', 'r');
-            $content = fread($fp, filesize($this->tokenStoragePath.'token.box'));
+        if ($type == 'file' && file_exists($this->tokenStoragePath . 'token.box')) {
+            $fp = fopen($this->tokenStoragePath . 'token.box', 'r');
+            $content = fread($fp, filesize($this->tokenStoragePath . 'token.box'));
             fclose($fp);
         } else {
             return false;
@@ -375,7 +378,7 @@ class Client
         } else {
             $array['timestamp'] = time();
             if ($type == 'file') {
-                $fp = fopen($this->tokenStoragePath.'token.box', 'w');
+                $fp = fopen($this->tokenStoragePath . 'token.box', 'w');
                 fwrite($fp, json_encode($array));
                 fclose($fp);
             }
@@ -385,7 +388,7 @@ class Client
 
     public function getPreviewLink($fileId)
     {
-        $url = $this->buildUrl('/files/'.$fileId, ['fields' => 'expiring_embed_link']);
+        $url = $this->buildUrl('/files/' . $fileId, ['fields' => 'expiring_embed_link']);
 
         $result = json_decode($this->get($url), true);
 
@@ -398,7 +401,7 @@ class Client
 
     public function getThumbnail($fileId, $extension = 'png', $minHeight = 64, $maxHeight = 64)
     {
-        $url = $this->buildUrl('/files/'.$fileId.'/thumbnail.'.$extension, [
+        $url = $this->buildUrl('/files/' . $fileId . '/thumbnail.' . $extension, [
             'min_height' => $minHeight,
             'min_width' => $maxHeight,
         ]);
@@ -414,7 +417,7 @@ class Client
 
     public function downloadFile($fileId)
     {
-        $url = $this->buildUrl('/files/'.$fileId.'/content');
+        $url = $this->buildUrl('/files/' . $fileId . '/content');
 
         /**
          * - if everything is valid, box redirects to the actual file
