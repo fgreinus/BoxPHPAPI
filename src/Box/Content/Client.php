@@ -68,12 +68,18 @@ class Client
     }
 
     /* Get the list of items in the mentioned folder */
-    private static function get($url)
+    private static function get($url, $followRedirects = false)
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+        if ($followRedirects) {
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_MAXREDIRS, 3);
+        }
+
         $data = curl_exec($ch);
         curl_close($ch);
         return $data;
@@ -377,11 +383,44 @@ class Client
         }
     }
 
-    private function parseResult($res)
+    public function getPreviewLink($fileId)
     {
-        $xml = simplexml_load_string($res);
-        $json = json_encode($xml);
-        $array = json_decode($json, TRUE);
-        return $array;
+        $url = $this->buildUrl('/files/'.$fileId, ['fields' => 'expiring_embed_link']);
+
+        $result = json_decode($this->get($url), true);
+
+        if (array_key_exists('expiring_embed_link', $result) && array_key_exists('url', $result['expiring_embed_link'])) {
+            return $result['expiring_embed_link']['url'];
+        } else {
+            return '';
+        }
+    }
+
+    public function getThumbnail($fileId, $extension = 'png', $minHeight = 64, $maxHeight = 64)
+    {
+        $url = $this->buildUrl('/files/'.$fileId.'/thumbnail.'.$extension, [
+            'min_height' => $minHeight,
+            'min_width' => $maxHeight,
+        ]);
+
+        /**
+         * - thumbnail is not yet available -> status code 202 and placeholder in Location-header
+         * - can't generate thumbnail for this file type -> status code 302 and redirection to the placeholder
+         * - thumbnail is available -> status 200
+         */
+
+        return $this->get($url, true);
+    }
+
+    public function downloadFile($fileId)
+    {
+        $url = $this->buildUrl('/files/'.$fileId.'/content');
+
+        /**
+         * - if everything is valid, box redirects to the actual file
+         * - 202 code in case of the file not being available for now, but later on
+         */
+
+        return $this->get($url, true);
     }
 }
