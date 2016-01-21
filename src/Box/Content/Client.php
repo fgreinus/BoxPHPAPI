@@ -399,12 +399,35 @@ class Client
         }
     }
 
-    public function getThumbnail($fileId, $extension = 'png', $minHeight = 64, $maxHeight = 64)
+    /**
+     * @param $fileId
+     * @param string $extension
+     * @param int $minHeight
+     * @param int $maxHeight
+     * @param int $minWidth
+     * @param int $maxWidth
+     * @return mixed
+     */
+    public function getThumbnail($fileId, $extension = 'png', $minHeight = null, $maxHeight = null, $minWidth = null, $maxWidth = null)
     {
-        $url = $this->buildUrl('/files/' . $fileId . '/thumbnail.' . $extension, [
-            'min_height' => $minHeight,
-            'min_width' => $maxHeight,
-        ]);
+        $urlParams = [];
+        if ($minHeight !== null) {
+            $urlParams['min_height'] = $minHeight;
+        }
+
+        if ($maxHeight !== null) {
+            $urlParams['max_height'] = $maxHeight;
+        }
+
+        if ($minWidth !== null) {
+            $urlParams['min_width'] = $minWidth;
+        }
+
+        if ($maxWidth !== null) {
+            $urlParams['max_width'] = $maxWidth;
+        }
+
+        $url = $this->buildUrl('/files/' . $fileId . '/thumbnail.' . $extension, $urlParams);
 
         /**
          * - thumbnail is not yet available -> status code 202 and placeholder in Location-header
