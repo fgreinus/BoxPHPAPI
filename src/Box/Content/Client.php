@@ -438,7 +438,7 @@ class Client
         return $this->get($url, true);
     }
 
-    public function downloadFile($fileId)
+    public function downloadFile($fileId, $directData = true)
     {
         $url = $this->buildUrl('/files/' . $fileId . '/content');
 
@@ -447,6 +447,27 @@ class Client
          * - 202 code in case of the file not being available for now, but later on
          */
 
-        return $this->get($url, true);
+        if ($directData) {
+            return $this->get($url, true);
+        } else {
+            $ch = curl_init();
+            $downloadLink = null;
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_HEADER, 1);
+            curl_setopt($ch, CURLOPT_HEADERFUNCTION, function ($curlRes, $headerData) use (&$downloadLink) {
+                if (substr($headerData, 0, 9) == 'Location:') {
+                    $downloadLink = substr($headerData, 10);
+                }
+
+                return strlen($headerData);
+            });
+
+            curl_exec($ch);
+            curl_close($ch);
+
+            return $downloadLink;
+        }
     }
 }
