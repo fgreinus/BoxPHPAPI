@@ -469,4 +469,11 @@ class Client
             return $downloadLink;
         }
     }
+    
+    /* Create a Collaboration */
+    public function createCollaboration($params)
+    {
+        $url = $this->buildUrl("/collaborations");
+        return json_decode($this->post($url, json_encode($params)), true);
+    }
 }
