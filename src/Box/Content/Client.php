@@ -476,4 +476,30 @@ class Client
         $url = $this->buildUrl("/collaborations");
         return json_decode($this->post($url, json_encode($params)), true);
     }
+
+    /* Get Shared Items */
+    public function getSharedItems($link)
+    {
+        $url = $this->buildUrl('/shared_items');
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["BoxApi: shared_link=".$link]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_MAXREDIRS, 3);
+
+        $data = curl_exec($ch);
+        curl_close($ch);
+
+        return json_decode($data);
+    }
+    /*Copy File */
+    public function copyFile($file,$params,$link)
+    {
+        $url = $this->buildUrl("/files/".$file."/copy");
+        return json_decode($this->post($url, json_encode($params),["BoxApi: shared_link=".$link]), true);
+    }
+
 }
